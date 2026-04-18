@@ -1,0 +1,20 @@
+{
+  "papaya": {
+    "light": "Anh sang mat troi day du, toi thieu 6-8 gio/ngay.",
+    "soil": "Dat thit nhe, thoat nuoc tot, giau huu co.",
+    "pests": "Rep sap, benh kham virus, sau duc than.",
+    "care": "Rat nhay cam voi ngap ung; can vun goc va bo sung kali dinh ky."
+  },
+  "mango": {
+    "light": "Ua nang manh, can noi thong thoang.",
+    "soil": "Dat thit pha cat, thoat nuoc tot, pH 5.5-7.5.",
+    "pests": "Ruoi vang, benh than thu, rep sap.",
+    "care": "Cat tia tan de thong thoang, bon phan huu co dau va cuoi mua mua."
+  },
+  "pigeonpeas": {
+    "light": "Can nang day du de ra hoa tot.",
+    "soil": "Dat thoat nuoc, pH 6.0-7.5.",
+    "pests": "Sau duc qua, rep, benh nam la.",
+    "care": "Tuoi vua phai, lam co som va theo doi sau hai khi ra hoa."
+  }
+}

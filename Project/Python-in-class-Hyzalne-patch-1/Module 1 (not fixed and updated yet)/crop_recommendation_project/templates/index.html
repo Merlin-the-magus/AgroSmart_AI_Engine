@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroSmart Predictor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container-fluid p-lg-5 p-3">
+    <!-- Header -->
+    <div class="text-center mb-5">
+        <h1 class="fw-extrabold" style="font-weight: 800; color: #14452F;">
+            <i class="fas fa-leaf"></i> AgroSmart Predictor
+        </h1>
+        <p class="text-muted fs-5">Hệ thống tư vấn cây trồng dựa trên Hybrid AI & Rule-based.<br>Canh tác thông minh, Nông nghiệp bền vững</p>
+    </div>
+
+    <div class="row g-4">
+        <!-- Sidebar Form -->
+        <div class="col-xl-3 col-lg-4">
+            <div class="card card-sidebar border-0 p-4 shadow-sm">
+                <div class="d-flex align-items-center mb-4">
+                    <h5 class="mb-0 fw-bold">Thông số đầu vào</h5>
+                    <i class="fas fa-tractor ms-auto text-success fs-4"></i>
+                </div>
+
+                <form method="POST">
+                    <label class="small fw-bold mb-1 d-flex align-items-center gap-2">
+                        Nito (N)
+                        <button type="button" class="hint-icon" data-bs-toggle="tooltip" data-bs-placement="top"
+                                title="{{ input_hints.get('N', 'Nhập giá trị phù hợp với đất hiện tại.') }}">?</button>
+                    </label>
+                    <div class="input-group-custom">
+                        <input type="number" step="any" name="N" placeholder="Ví dụ: 40"
+                               value="{{ form_data.get('N', '') }}" required>
+                    </div>
+                    {% if form_errors.get('N') %}<small class="text-danger d-block mt-1">{{ form_errors.get('N') }}</small>{% endif %}
+
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label class="small fw-bold mb-1 d-flex align-items-center gap-2">
+                                Phốt pho (P)
+                                <button type="button" class="hint-icon" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        title="{{ input_hints.get('P', 'Nhập giá trị phù hợp với đất hiện tại.') }}">?</button>
+                            </label>
+                            <div class="input-group-custom">
+                                <i class="fas fa-vial"></i>
+                                <input type="number" step="any" name="P" placeholder="P"
+                                       value="{{ form_data.get('P', '') }}" required>
+                            </div>
+                            {% if form_errors.get('P') %}<small class="text-danger d-block mt-1">{{ form_errors.get('P') }}</small>{% endif %}
+                        </div>
+                        <div class="col-6">
+                            <label class="small fw-bold mb-1 d-flex align-items-center gap-2">
+                                Kali (K)
+                                <button type="button" class="hint-icon" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        title="{{ input_hints.get('K', 'Nhập giá trị phù hợp với đất hiện tại.') }}">?</button>
+                            </label>
+                            <div class="input-group-custom">
+                                <i class="fas fa-droplet"></i>
+                                <input type="number" step="any" name="K" placeholder="K"
+                                       value="{{ form_data.get('K', '') }}" required>
+                            </div>
+                            {% if form_errors.get('K') %}<small class="text-danger d-block mt-1">{{ form_errors.get('K') }}</small>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label class="small fw-bold mb-1 d-flex align-items-center gap-2">
+                                Nhiệt độ (°C)
+                                <button type="button" class="hint-icon" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        title="{{ input_hints.get('temperature', 'Nhập giá trị phù hợp với đất hiện tại.') }}">?</button>
+                            </label>
+                            <div class="input-group-custom">
+                                <i class="fas fa-temperature-low"></i>
+                                <input type="number" step="any" name="temperature" placeholder="Độ C"
+                                       value="{{ form_data.get('temperature', '') }}" required>
+                            </div>
+                            {% if form_errors.get('temperature') %}<small class="text-danger d-block mt-1">{{ form_errors.get('temperature') }}</small>{% endif %}
+                        </div>
+                        <div class="col-6">
+                            <label class="small fw-bold mb-1 d-flex align-items-center gap-2">
+                                Độ ẩm (%)
+                                <button type="button" class="hint-icon" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        title="{{ input_hints.get('humidity', 'Nhập giá trị phù hợp với đất hiện tại.') }}">?</button>
+                            </label>
+                            <div class="input-group-custom">
+                                <i class="fas fa-sun"></i>
+                                <input type="number" step="any" name="humidity" placeholder="%"
+                                       value="{{ form_data.get('humidity', '') }}" required>
+                            </div>
+                            {% if form_errors.get('humidity') %}<small class="text-danger d-block mt-1">{{ form_errors.get('humidity') }}</small>{% endif %}
+                        </div>
+                    </div>
+
+                    <label class="small fw-bold mb-1 d-flex align-items-center gap-2">
+                        Độ pH
+                        <button type="button" class="hint-icon" data-bs-toggle="tooltip" data-bs-placement="top"
+                                title="{{ input_hints.get('ph', 'Độ pH hợp lệ từ 0 đến 14.') }}">?</button>
+                    </label>
+                    <div class="input-group-custom">
+                        <span class="ph-label">pH</span>
+                        <input type="number" step="0.1" name="ph" placeholder="0.0"
+                               value="{{ form_data.get('ph', '') }}" required>
+                    </div>
+                    {% if form_errors.get('ph') %}<small class="text-danger d-block mt-1">{{ form_errors.get('ph') }}</small>{% endif %}
+
+                    <label class="small fw-bold mb-1 d-flex align-items-center gap-2">
+                        Lượng mưa (mm)
+                        <button type="button" class="hint-icon" data-bs-toggle="tooltip" data-bs-placement="top"
+                                title="{{ input_hints.get('rainfall', 'Nhập giá trị phù hợp với đất hiện tại.') }}">?</button>
+                    </label>
+                    <div class="input-group-custom">
+                        <i class="fas fa-cloud-showers-heavy"></i>
+                        <input type="number" step="any" name="rainfall" placeholder="Mưa"
+                               value="{{ form_data.get('rainfall', '') }}" required>
+                    </div>
+                    {% if form_errors.get('rainfall') %}<small class="text-danger d-block mt-1">{{ form_errors.get('rainfall') }}</small>{% endif %}
+
+                    <button type="submit" class="btn btn-predict w-100 fw-bold mt-2">KHỞI TẠO DỰ ĐOÁN</button>
+                </form>
+
+                <hr class="my-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="mb-0 fw-bold"><i class="fas fa-history me-2 text-muted"></i>Lịch sử dự đoán</h6>
+                    {% if history %}
+                    <form method="POST" action="{{ url_for('clear_history') }}">
+                        <button class="btn btn-link p-0 text-muted small" type="submit" title="Xóa lịch sử">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+                {% if history %}
+                    {% for h in history %}
+                    <div class="history-item">
+                        <div class="d-flex justify-content-between">
+                            <strong>{{ h.crop }}</strong>
+                            <small class="text-muted">{{ h.time }}</small>
+                        </div>
+                        <small class="text-muted">{{ h.snapshot }}</small><br>
+                        <small class="text-success fw-bold">Độ phù hợp {{ h.accuracy }}%</small>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <small class="text-muted">Chưa có lịch sử dự đoán.</small>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Result Area -->
+        <div class="col-xl-9 col-lg-8">
+            {% if result %}
+                {% if result.error %}
+                    <div class="alert alert-danger border-0 shadow-sm">
+                        <strong>Đã xảy ra lỗi:</strong> {{ result.error }}
+                    </div>
+                {% elif result.is_low_conf %}
+                    <div class="card border-0 shadow-sm p-5 text-center" style="border-radius: 40px;">
+                        <i class="fas fa-wind fa-4x text-danger mb-3"></i>
+                        <h2 class="fw-bold">Môi trường quá khắc nghiệt!</h2>
+                        <p class="text-muted fs-5">Các chỉ số đo được không phù hợp để canh tác bất kỳ loại cây nào trong danh sách.</p>
+                    </div>
+                {% else %}
+                    <!-- Hero Result -->
+                    <div class="card card-main-result border-0 shadow-lg mb-5 text-white p-4">
+                        <div class="row g-0 align-items-center w-100">
+                            <div class="col-md-4 text-center">
+                                <img src="{{ result.final.image }}" class="rounded-img-hero shadow-lg" onerror="this.src='https://via.placeholder.com/400?text=Crop'">
+                            </div>
+                            <div class="col-md-5 p-4">
+                                <h6 class="text-uppercase opacity-75 fw-bold mb-2">Cây trồng đề xuất tốt nhất</h6>
+                                <h1 class="display-2 fw-bold mb-0">{{ result.final.crop }}</h1>
+                                <p class="fs-4">Độ phù hợp: <span class="fw-bold">{{ result.final.accuracy }}%</span></p>
+                                <button class="btn btn-light btn-sm rounded-pill px-3"
+                                        data-bs-toggle="modal" data-bs-target="#cropDetailFinalModal">
+                                    <i class="fas fa-circle-info me-1"></i> Xem chi tiết
+                                </button>
+                            </div>
+                            <div class="col-md-3 text-center">
+                                <div class="progress-circle-box mx-auto" style="background: conic-gradient(#fff {{ result.final.accuracy * 3.6 }}deg, rgba(255,255,255,0.1) 0deg)">
+                                    <div class="circle-inner">{{ result.final.accuracy }}%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top 3 -->
+                    <h5 class="fw-bold mb-4"><i class="fas fa-list-ol text-success me-2"></i> Danh sách Top 3 ứng viên hàng đầu</h5>
+                    <div class="row g-4">
+                        {% for item in result.top_3 %}
+                        <div class="col-md-4">
+                            <div class="card card-sub-crop border-0 shadow-sm p-4">
+                                <div class="d-flex align-items-center mb-4">
+                                    <img src="{{ item.image }}" class="crop-thumb shadow-sm me-3" onerror="this.src='https://via.placeholder.com/100?text=Plant'">
+                                    <h5 class="fw-bold mb-0 text-truncate">{{ item.crop }}</h5>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted small">Điểm Rule:</span>
+                                    <span class="text-warning small fw-bold">
+                                        {% set stars = (item.score / 2) | int %}
+                                        {% for i in range(stars) %}<i class="fas fa-star"></i>{% endfor %}
+                                        <span class="text-muted opacity-50">{{ item.score }}/11</span>
+                                    </span>
+                                </div>
+
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="text-muted small">Độ phù hợp</span>
+                                        <span class="small fw-bold">{{ item.accuracy }}%</span>
+                                    </div>
+                                    <div class="progress" style="height: 10px; border-radius: 20px; background: #eee;">
+                                        <div class="progress-bar" style="width: {{ item.accuracy }}%; background: #2D6A4F;"></div>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted small">Trạng thái</span>
+                                    {% if item.crop == result.final.crop %}
+                                        <span class="badge-custom bg-best"><i class="fas fa-check-circle"></i> Best Choice</span>
+                                    {% else %}
+                                        <span class="badge-custom bg-good">Good Option</span>
+                                    {% endif %}
+                                </div>
+                                <button class="btn btn-outline-success btn-sm w-100 mt-3"
+                                        data-bs-toggle="modal" data-bs-target="#cropDetailModal{{ loop.index }}">
+                                    <i class="fas fa-eye me-1"></i> Xem chi tiết
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="modal fade" id="cropDetailModal{{ loop.index }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
+                                <div class="modal-content border-0 overflow-hidden">
+                                    <div class="modal-header-custom">
+                                        <img src="{{ item.image }}" onerror="this.src='https://via.placeholder.com/900x240?text=Crop'">
+                                        <div class="overlay"></div>
+                                        <div class="modal-title-wrap">
+                                            <h3 class="text-white fw-bold mb-1">{{ item.crop }}</h3>
+                                            <span class="badge rounded-pill text-bg-success">Độ phù hợp {{ item.accuracy }}%</span>
+                                        </div>
+                                    </div>
+                                    <div class="modal-body p-4">
+                                        <h6 class="fw-bold mb-3">Khoảng thông số theo file export_crops.csv</h6>
+                                        <div class="row g-2 mb-4">
+                                            <div class="col-6 col-md-3"><div class="detail-chip"><small>Nito</small><strong>{{ item.detail_ranges.N.min }} - {{ item.detail_ranges.N.max }}</strong></div></div>
+                                            <div class="col-6 col-md-3"><div class="detail-chip"><small>Phốt pho</small><strong>{{ item.detail_ranges.P.min }} - {{ item.detail_ranges.P.max }}</strong></div></div>
+                                            <div class="col-6 col-md-3"><div class="detail-chip"><small>Kali</small><strong>{{ item.detail_ranges.K.min }} - {{ item.detail_ranges.K.max }}</strong></div></div>
+                                            <div class="col-6 col-md-3"><div class="detail-chip"><small>Độ pH</small><strong>{{ item.detail_ranges.ph.min }} - {{ item.detail_ranges.ph.max }}</strong></div></div>
+                                            <div class="col-6 col-md-4"><div class="detail-chip"><small>Nhiệt độ</small><strong>{{ item.detail_ranges.temperature.min }} - {{ item.detail_ranges.temperature.max }}°C</strong></div></div>
+                                            <div class="col-6 col-md-4"><div class="detail-chip"><small>Độ ẩm</small><strong>{{ item.detail_ranges.humidity.min }} - {{ item.detail_ranges.humidity.max }}%</strong></div></div>
+                                            <div class="col-12 col-md-4"><div class="detail-chip"><small>Lượng mưa</small><strong>{{ item.detail_ranges.rainfall.min }} - {{ item.detail_ranges.rainfall.max }} mm</strong></div></div>
+                                        </div>
+                                        <h6 class="fw-bold mb-3">Điều kiện & kỹ thuật canh tác</h6>
+                                        <div class="row g-3">
+                                            <div class="col-md-6"><strong>Ánh sáng:</strong><br><span class="text-muted">{{ item.details.light }}</span></div>
+                                            <div class="col-md-6"><strong>Sâu bệnh:</strong><br><span class="text-muted">{{ item.details.pests }}</span></div>
+                                            <div class="col-md-6"><strong>Loại đất:</strong><br><span class="text-muted">{{ item.details.soil }}</span></div>
+                                            <div class="col-md-6"><strong>Kỹ thuật chăm sóc:</strong><br><span class="text-muted">{{ item.details.care }}</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    {% if result.analysis %}
+                    <div class="card border-0 shadow-sm p-4 mt-5 analysis-card">
+                        <h3 class="fw-bold mb-4"><i class="fas fa-chart-column me-2 text-success"></i>Phân tích & Thống kê</h3>
+                        <div class="row g-4">
+                            <div class="col-lg-6">
+                                <h6 class="fw-bold mb-3">Đánh giá độ quan trọng dinh dưỡng</h6>
+                                {% for n in result.analysis.nutrient_review %}
+                                <div class="d-flex justify-content-between align-items-center nutrient-row">
+                                    <div>
+                                        <strong>{{ n.label }}</strong>
+                                        <small class="d-block text-muted">Thực tế {{ n.value }} | Lý tưởng {{ n.range_text }}</small>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge rounded-pill text-bg-light">{{ n.importance }}</span>
+                                        <small class="d-block {% if n.status == 'Dat' %}text-success{% elif n.status == 'Thieu' %}text-warning{% else %}text-danger{% endif %}">{{ n.status }}</small>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="col-lg-6">
+                                <h6 class="fw-bold mb-3">Hồ sơ đất vs {{ result.final.crop }}</h6>
+                                <canvas id="radarChart" height="260"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endif %}
+            {% else %}
+                <!-- Empty State -->
+                <div class="text-center p-5 mt-5 opacity-50">
+                    <i class="fas fa-chart-pie fa-5x text-success mb-4"></i>
+                    <h3>Hệ thống đang sẵn sàng</h3>
+                    <p>Vui lòng nhập thông số đất và môi trường bên trái để bắt đầu phân tích AI.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% if result and not result.error and not result.is_low_conf %}
+<div class="modal fade" id="cropDetailFinalModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 overflow-hidden">
+            <div class="modal-header-custom">
+                <img src="{{ result.final.image }}" onerror="this.src='https://via.placeholder.com/900x240?text=Crop'">
+                <div class="overlay"></div>
+                <div class="modal-title-wrap">
+                    <h3 class="text-white fw-bold mb-1">{{ result.final.crop }}</h3>
+                    <span class="badge rounded-pill text-bg-success">Độ phù hợp {{ result.final.accuracy }}%</span>
+                </div>
+            </div>
+            <div class="modal-body p-4">
+                <h6 class="fw-bold mb-3">Khoảng thông số theo file export_crops.csv</h6>
+                <div class="row g-2 mb-4">
+                    <div class="col-6 col-md-3"><div class="detail-chip"><small>Nito</small><strong>{{ result.final.detail_ranges.N.min }} - {{ result.final.detail_ranges.N.max }}</strong></div></div>
+                    <div class="col-6 col-md-3"><div class="detail-chip"><small>Phốt pho</small><strong>{{ result.final.detail_ranges.P.min }} - {{ result.final.detail_ranges.P.max }}</strong></div></div>
+                    <div class="col-6 col-md-3"><div class="detail-chip"><small>Kali</small><strong>{{ result.final.detail_ranges.K.min }} - {{ result.final.detail_ranges.K.max }}</strong></div></div>
+                    <div class="col-6 col-md-3"><div class="detail-chip"><small>Độ pH</small><strong>{{ result.final.detail_ranges.ph.min }} - {{ result.final.detail_ranges.ph.max }}</strong></div></div>
+                    <div class="col-6 col-md-4"><div class="detail-chip"><small>Nhiệt độ</small><strong>{{ result.final.detail_ranges.temperature.min }} - {{ result.final.detail_ranges.temperature.max }}°C</strong></div></div>
+                    <div class="col-6 col-md-4"><div class="detail-chip"><small>Độ ẩm</small><strong>{{ result.final.detail_ranges.humidity.min }} - {{ result.final.detail_ranges.humidity.max }}%</strong></div></div>
+                    <div class="col-12 col-md-4"><div class="detail-chip"><small>Lượng mưa</small><strong>{{ result.final.detail_ranges.rainfall.min }} - {{ result.final.detail_ranges.rainfall.max }} mm</strong></div></div>
+                </div>
+                <h6 class="fw-bold mb-3">Điều kiện & kỹ thuật canh tác</h6>
+                <div class="row g-3">
+                    <div class="col-md-6"><strong>Ánh sáng:</strong><br><span class="text-muted">{{ result.final.details.light }}</span></div>
+                    <div class="col-md-6"><strong>Sâu bệnh:</strong><br><span class="text-muted">{{ result.final.details.pests }}</span></div>
+                    <div class="col-md-6"><strong>Loại đất:</strong><br><span class="text-muted">{{ result.final.details.soil }}</span></div>
+                    <div class="col-md-6"><strong>Kỹ thuật chăm sóc:</strong><br><span class="text-muted">{{ result.final.details.care }}</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% if result and result.analysis and not result.error and not result.is_low_conf %}
+<script>
+const radarCtx = document.getElementById("radarChart");
+if (radarCtx) {
+    const labels = {{ result.analysis.radar_labels | tojson }};
+    const idealData = {{ result.analysis.ideal_radar | tojson }};
+    const actualData = {{ result.analysis.actual_radar | tojson }};
+
+    new Chart(radarCtx, {
+        type: "radar",
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: "Ngưỡng lý tưởng",
+                    data: idealData,
+                    fill: true,
+                    backgroundColor: "rgba(52, 73, 94, 0.15)",
+                    borderColor: "#2c3e50",
+                    pointBackgroundColor: "#2c3e50"
+                },
+                {
+                    label: "Đất thực tế",
+                    data: actualData,
+                    fill: true,
+                    backgroundColor: "rgba(22, 160, 133, 0.35)",
+                    borderColor: "#0f8a72",
+                    pointBackgroundColor: "#0f8a72"
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                r: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+</script>
+{% endif %}
+<script>
+const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+tooltipTriggerList.forEach((tooltipTriggerEl) => {
+    new bootstrap.Tooltip(tooltipTriggerEl);
+});
+</script>
+</body>
+</html>
